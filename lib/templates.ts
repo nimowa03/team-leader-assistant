@@ -10,32 +10,40 @@ export const generateMeetingMinutes = (
 ): string => {
     const date = meeting.date;
 
-    const presentMembers = meeting.records
+    const presentList = meeting.records
         .filter(r => r.status === 'PRESENT')
         .map(r => members.find(m => m.id === r.memberId)?.name)
-        .filter(Boolean)
-        .join(', ');
+        .filter(Boolean);
 
-    const lateMembers = meeting.records
+    const lateList = meeting.records
         .filter(r => r.status === 'LATE')
         .map(r => members.find(m => m.id === r.memberId)?.name)
-        .filter(Boolean)
-        .join(', ');
+        .filter(Boolean);
 
-    const absentMembers = meeting.records
+    const absentList = meeting.records
         .filter(r => r.status === 'ABSENT')
         .map(r => members.find(m => m.id === r.memberId)?.name)
-        .filter(Boolean)
-        .join(', ');
+        .filter(Boolean);
+
+    let attendanceSection = `✅ 참석 (${presentList.length}명): ${presentList.join(', ')}`;
+
+    if (lateList.length > 0) {
+        attendanceSection += `\n⚠️ 지각 (${lateList.length}명): ${lateList.join(', ')}`;
+    }
+
+    if (absentList.length > 0) {
+        attendanceSection += `\n❌ 결석 (${absentList.length}명): ${absentList.join(', ')}`;
+    }
+
+    if (lateList.length === 0 && absentList.length === 0) {
+        attendanceSection = `🎉 전원 참석! (${presentList.length}명)\n   ${presentList.join(', ')}`;
+    }
 
     return `
 [📢 ${teamName} 정기 모임 결과]
 📅 일시: ${date}
 
-👋 출석 현황
-- 함께하신 분: ${presentMembers || '없음'}
-- 조금 늦으신 분: ${lateMembers || '없음'}
-- 아쉽게 못 오신 분: ${absentMembers || '없음'}
+${attendanceSection}
 
 ${content}
 `.trim();
