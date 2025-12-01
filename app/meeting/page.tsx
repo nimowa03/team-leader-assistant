@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react';
 import { Calendar, Copy, Send, Check, AlertCircle, Sparkles, Loader2 } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { Member, Meeting, AttendanceRecord, getMembers, getSettings, updateMemberStatus } from '@/lib/storage';
+import { Member, Meeting, AttendanceRecord } from '@/lib/types';
+import { getMembers, getSettings, updateMemberStatus } from '@/lib/storage';
 import { generateMeetingMinutes, MeetingData } from '@/lib/templates';
 import { sendToDiscord } from '@/lib/discord';
 
@@ -171,8 +172,8 @@ export default function MeetingPage() {
                                                         key={opt.val}
                                                         onClick={() => updateRecord(member.id, opt.val as any)}
                                                         className={`px-3 py-1.5 text-xs font-bold rounded-md transition-all duration-200 ${record.status === opt.val
-                                                                ? opt.activeClass
-                                                                : 'text-slate-400 hover:bg-slate-50'
+                                                            ? opt.activeClass
+                                                            : 'text-slate-400 hover:bg-slate-50'
                                                             }`}
                                                     >
                                                         {opt.label}

@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react';
 import { Copy, Send, Check, AlertCircle, X, Sparkles, Loader2 } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { Member } from '@/lib/types';
-import { Assignment, AssignmentRecord, getMembers, getSettings, updateMemberStatus } from '@/lib/storage';
+import { Member, Assignment, AssignmentRecord } from '@/lib/types';
+import { getMembers, getSettings, updateMemberStatus } from '@/lib/storage';
 import { generateAssignmentNotice } from '@/lib/templates';
 import { sendToDiscord } from '@/lib/discord';
 
@@ -138,8 +138,8 @@ export default function AssignmentPage() {
                                         key={member.id}
                                         onClick={() => toggleStatus(member.id)}
                                         className={`group flex items-center justify-between p-4 rounded-2xl cursor-pointer transition-all duration-200 border-2 ${isSubmitted
-                                                ? 'bg-indigo-50 border-indigo-500 shadow-md shadow-indigo-100'
-                                                : 'bg-white border-slate-100 hover:border-indigo-200 hover:shadow-sm'
+                                            ? 'bg-indigo-50 border-indigo-500 shadow-md shadow-indigo-100'
+                                            : 'bg-white border-slate-100 hover:border-indigo-200 hover:shadow-sm'
                                             }`}
                                     >
                                         <div className="flex items-center gap-4">

@@ -5,7 +5,8 @@ import { Plus, Trash2, CheckCircle2, UserPlus, MoreHorizontal, Loader2 } from 'l
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { StatusBadge } from '@/components/ui/StatusBadge';
-import { Member, getMembers, addMember, updateMemberStatus, deleteMember, getSettings } from '@/lib/storage';
+import { Member } from '@/lib/types';
+import { getMembers, addMember, updateMemberStatus, deleteMember, getSettings } from '@/lib/storage';
 
 export default function Dashboard() {
   const [members, setMembers] = useState<Member[]>([]);

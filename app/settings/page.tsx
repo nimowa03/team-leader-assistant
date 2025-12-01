@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react';
 import { Save, CheckCircle2, Loader2 } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { getSettings, saveSettings, AppSettings } from '@/lib/storage';
+import { AppSettings } from '@/lib/types';
+import { getSettings, saveSettings } from '@/lib/storage';
 
 export default function SettingsPage() {
     const [settings, setSettings] = useState<AppSettings>({
