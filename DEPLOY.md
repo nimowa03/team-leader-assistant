@@ -29,7 +29,7 @@
 | :--- | :--- |
 | `NEXT_PUBLIC_SUPABASE_URL` | `https://fjrmpknxhjasrgkathdt.supabase.co` |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...` (기존 값 유지) |
-| `GEMINI_API_KEY` | `AIzaSyCMZIkznqRHa1SZ7FwBHDOzshnO1GNGBF8` |
+| `GEMINI_API_KEY` | `YOUR_GEMINI_API_KEY` (Google AI Studio에서 발급받은 키) |
 
 > **팁**: 값을 하나씩 넣고 `Add` 버튼을 눌러주세요.
 
