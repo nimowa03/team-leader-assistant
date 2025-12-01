@@ -50,34 +50,44 @@ ${content}
 };
 
 export const generateAssignmentNotice = (assignment: Assignment, members: Member[], teamName: string): string => {
-    const submitted = assignment.records
+    const submittedList = assignment.records
         .filter(r => r.status === 'SUBMITTED')
         .map(r => members.find(m => m.id === r.memberId)?.name)
-        .filter(Boolean)
-        .join(', ');
+        .filter(Boolean);
 
-    const notSubmitted = assignment.records
+    const notSubmittedList = assignment.records
         .filter(r => r.status === 'NOT_SUBMITTED')
         .map(r => members.find(m => m.id === r.memberId)?.name)
-        .filter(Boolean)
-        .join(', ');
+        .filter(Boolean);
 
     const totalCount = members.length;
-    const submittedCount = assignment.records.filter(r => r.status === 'SUBMITTED').length;
+    const submittedCount = submittedList.length;
     const rate = Math.round((submittedCount / totalCount) * 100) || 0;
 
+    let statusSection = '';
+
+    if (submittedCount > 0) {
+        statusSection += `✅ 제출 완료: ${submittedList.join(', ')}\n`;
+    }
+
+    if (notSubmittedList.length > 0) {
+        statusSection += `👀 미제출: ${notSubmittedList.join(', ')}\n`;
+    }
+
+    if (submittedCount === totalCount) {
+        statusSection = `🎉 와우! 전원 제출 완료! 고생하셨습니다. 👏👏👏\n`;
+    }
+
+    const footerMessage = notSubmittedList.length > 0
+        ? '마감 시간 전까지 꼭 제출 부탁드립니다! 🙏'
+        : '이번 주도 모두 정말 고생 많으셨습니다!';
+
     return `
-[🔥 ${teamName} 과제 현황 알림]
+[🔥 ${teamName} 과제 현황]
 📅 마감: 일요일 오후 9시
+📊 제출율: ${rate}% (${submittedCount}/${totalCount}명)
 
-📊 현재 제출율: ${rate}% (${submittedCount}/${totalCount}명)
-
-✅ 제출 완료하신 분들 (고생하셨습니다!)
-${submitted || '-'}
-
-👀 아직 제출 전이신 분들 (화이팅!)
-${notSubmitted || '없음 (전원 제출 완료! 🎉)'}
-
-${notSubmitted ? '마감 시간 전까지 꼭 제출 부탁드립니다! 🙏' : '이번 주도 모두 정말 고생 많으셨습니다! 다음 주도 화이팅해요! 💪'}
+${statusSection}
+${footerMessage}
 `.trim();
 };
