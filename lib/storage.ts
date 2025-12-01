@@ -1,7 +1,7 @@
 import { supabase } from './supabase';
 import { Member, Meeting, Assignment, AppSettings } from './types';
 
-// --- Members ---
+// --- 멤버 관리 (Members) ---
 export const getMembers = async (): Promise<Member[]> => {
     const { data, error } = await supabase
         .from('members')
@@ -9,11 +9,11 @@ export const getMembers = async (): Promise<Member[]> => {
         .order('created_at', { ascending: true });
 
     if (error) {
-        console.error('Error fetching members:', error);
+        console.error('멤버 목록 조회 실패:', error);
         return [];
     }
 
-    // Map DB columns to Member type (snake_case to camelCase)
+    // DB 컬럼(snake_case)을 앱 타입(camelCase)으로 변환
     return (data || []).map((m: any) => ({
         id: m.id,
         name: m.name,
@@ -31,7 +31,7 @@ export const addMember = async (name: string): Promise<Member | null> => {
         .single();
 
     if (error) {
-        console.error('Error adding member:', error);
+        console.error('멤버 추가 실패:', error);
         return null;
     }
 
@@ -45,7 +45,7 @@ export const addMember = async (name: string): Promise<Member | null> => {
 };
 
 export const updateMemberStatus = async (id: string, updates: Partial<Member>) => {
-    // Convert camelCase updates to snake_case for DB
+    // 앱 타입(camelCase)을 DB 컬럼(snake_case)으로 변환
     const dbUpdates: any = {};
     if (updates.name) dbUpdates.name = updates.name;
     if (updates.status) dbUpdates.status = updates.status;
@@ -58,7 +58,7 @@ export const updateMemberStatus = async (id: string, updates: Partial<Member>) =
         .eq('id', id);
 
     if (error) {
-        console.error('Error updating member:', error);
+        console.error('멤버 정보 수정 실패:', error);
     }
 };
 
@@ -69,11 +69,11 @@ export const deleteMember = async (id: string) => {
         .eq('id', id);
 
     if (error) {
-        console.error('Error deleting member:', error);
+        console.error('멤버 삭제 실패:', error);
     }
 };
 
-// --- Settings ---
+// --- 설정 관리 (Settings) ---
 export const getSettings = async (): Promise<AppSettings> => {
     const { data, error } = await supabase
         .from('settings')
@@ -82,7 +82,7 @@ export const getSettings = async (): Promise<AppSettings> => {
         .single();
 
     if (error) {
-        // If no settings found (first run), return default
+        // 설정이 없으면(첫 실행 시), 기본값 반환
         return { teamName: '우리 조', discordWebhookUrl: '' };
     }
 
@@ -102,14 +102,12 @@ export const saveSettings = async (settings: AppSettings) => {
         });
 
     if (error) {
-        console.error('Error saving settings:', error);
+        console.error('설정 저장 실패:', error);
     }
 };
 
-// --- Meetings & Assignments (Local State Only for now) ---
-// Since we don't have tables for meetings/assignments history yet, 
-// we will keep using them as temporary state in the pages or just not persist them fully 
-// (as per current app logic, they are mostly for generating text).
-// However, to keep the app consistent, we might want to just keep the types but remove storage logic 
-// if they are not being saved to DB. 
-// For this phase, we focus on Members and Settings persistence.
+// --- 모임 및 과제 (현재는 로컬 상태로만 관리) ---
+// 모임이나 과제 히스토리를 저장하는 테이블이 아직 없으므로,
+// 페이지 내에서 임시 상태로만 사용하거나 DB에 저장하지 않습니다.
+// (현재 앱 로직상 텍스트 생성 용도로 주로 쓰임)
+// 추후 필요 시 테이블을 추가하여 확장할 수 있습니다.
