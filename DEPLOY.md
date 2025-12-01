@@ -28,7 +28,8 @@
 | Key | Value |
 | :--- | :--- |
 | `NEXT_PUBLIC_SUPABASE_URL` | `https://fjrmpknxhjasrgkathdt.supabase.co` |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZqcm1wa254aGphc3Jna2F0aGR0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ1OTYyNDEsImV4cCI6MjA4MDE3MjI0MX0.gVuyBMvF2mYwMP2AuW43vOMaDCVagN7GyPfN4u4hjuE` |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...` (기존 값 유지) |
+| `GEMINI_API_KEY` | `AIzaSyCMZIkznqRHa1SZ7FwBHDOzshnO1GNGBF8` |
 
 > **팁**: 값을 하나씩 넣고 `Add` 버튼을 눌러주세요.
 

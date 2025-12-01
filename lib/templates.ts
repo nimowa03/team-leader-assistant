@@ -1,17 +1,12 @@
 import { Meeting, Assignment, Member, AttendanceStatus } from './types';
 
-export interface MeetingData {
-    agenda: string;
-    discussion: string;
-    decision: string;
-    nextSteps: string;
-}
+
 
 export const generateMeetingMinutes = (
     meeting: Meeting,
     members: Member[],
     teamName: string,
-    data?: MeetingData // Optional structured data
+    content: string // Freeform or AI-generated content
 ): string => {
     const date = meeting.date;
 
@@ -33,29 +28,6 @@ export const generateMeetingMinutes = (
         .filter(Boolean)
         .join(', ');
 
-    // Default content if no structured data provided
-    let contentSection = `📝 회의 내용\n(이곳에 회의 내용을 간단히 적어주세요)`;
-    let nextSection = `🚀 다음 일정 및 과제\n- 다음 모임: \n- 금주 과제: `;
-
-    // Use structured data if available
-    if (data) {
-        contentSection = `
-📌 안건
-${data.agenda || '- (없음)'}
-
-🗣️ 주요 논의
-${data.discussion || '- (없음)'}
-
-✨ 결정 사항
-${data.decision || '- (없음)'}
-`.trim();
-
-        nextSection = `
-🚀 다음 일정 및 과제
-${data.nextSteps || '- (없음)'}
-`.trim();
-    }
-
     return `
 [${teamName} 모임 회의록]
 📅 일시: ${date}
@@ -65,9 +37,7 @@ ${data.nextSteps || '- (없음)'}
 - 지각: ${lateMembers || '없음'}
 - 결석: ${absentMembers || '없음'}
 
-${contentSection}
-
-${nextSection}
+${content}
 `.trim();
 };
 

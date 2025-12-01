@@ -1,12 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Calendar, Copy, Send, Check, AlertCircle, Sparkles, Loader2 } from 'lucide-react';
+import { Calendar, Copy, Send, Check, AlertCircle, Sparkles, Loader2, Wand2 } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Member, Meeting, AttendanceRecord } from '@/lib/types';
 import { getMembers, getSettings, updateMemberStatus } from '@/lib/storage';
-import { generateMeetingMinutes, MeetingData } from '@/lib/templates';
+import { generateMeetingMinutes } from '@/lib/templates';
 import { sendToDiscord } from '@/lib/discord';
 
 export default function MeetingPage() {
@@ -16,12 +16,9 @@ export default function MeetingPage() {
     const [teamName, setTeamName] = useState('');
     const [isLoading, setIsLoading] = useState(true);
 
-    const [meetingData, setMeetingData] = useState<MeetingData>({
-        agenda: '',
-        discussion: '',
-        decision: '',
-        nextSteps: ''
-    });
+    // Freeform notes state
+    const [notes, setNotes] = useState('');
+    const [isGenerating, setIsGenerating] = useState(false);
 
     const [generatedMinutes, setGeneratedMinutes] = useState('');
     const [isSending, setIsSending] = useState(false);
@@ -56,13 +53,43 @@ export default function MeetingPage() {
         setRecords(records.map(r => r.memberId === memberId ? { ...r, status } : r));
     };
 
+    const handleSmartOrganize = async () => {
+        if (!notes.trim()) {
+            alert('회의 내용을 먼저 입력해주세요!');
+            return;
+        }
+
+        setIsGenerating(true);
+        try {
+            const response = await fetch('/api/generate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ notes }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                setNotes(data.result); // Replace notes with organized content
+            } else {
+                alert(data.error || '정리 중 오류가 발생했습니다.');
+            }
+        } catch (error) {
+            console.error('AI Generate Error:', error);
+            alert('AI 서버와 통신 중 오류가 발생했습니다.');
+        } finally {
+            setIsGenerating(false);
+        }
+    };
+
     const handleGenerate = () => {
         const meeting: Meeting = {
             id: 'temp',
             date,
             records
         };
-        const minutes = generateMeetingMinutes(meeting, members, teamName, meetingData);
+        // Pass the notes directly (whether raw or organized)
+        const minutes = generateMeetingMinutes(meeting, members, teamName, notes);
         setGeneratedMinutes(minutes);
     };
 
@@ -93,17 +120,12 @@ export default function MeetingPage() {
     const handleFinalize = async () => {
         if (!confirm('출석 결과를 확정하시겠습니까?')) return;
 
-        // Process updates sequentially or in parallel
         const updates = records
             .filter(r => r.status === 'ABSENT')
             .map(async (r) => {
                 const member = members.find(m => m.id === r.memberId);
                 if (member) {
                     const newAbsentCount = member.absentCount + 1;
-                    // Logic: 3 absences = ELIMINATED (Example rule, or keep it simple as user requested)
-                    // User didn't specify exact rule, so we just increment for now.
-                    // Or if user wants manual control, we just increment.
-                    // Let's stick to incrementing.
                     await updateMemberStatus(member.id, {
                         absentCount: newAbsentCount
                     });
@@ -113,7 +135,7 @@ export default function MeetingPage() {
         await Promise.all(updates);
 
         alert('출석 처리가 완료되었습니다.');
-        loadData(); // Reload to reflect changes
+        loadData();
     };
 
     if (isLoading) {
@@ -128,7 +150,7 @@ export default function MeetingPage() {
         <div className="space-y-8 animate-in fade-in duration-500">
             <header>
                 <h1 className="text-3xl font-bold text-slate-900 tracking-tight mb-2">모임 관리 & 회의록</h1>
-                <p className="text-slate-500 font-medium">출석을 체크하고 키워드만 입력하면 회의록이 완성됩니다.</p>
+                <p className="text-slate-500 font-medium">출석을 체크하고 회의 내용을 자유롭게 적으세요. AI가 정리해드립니다.</p>
             </header>
 
             <div className="grid lg:grid-cols-12 gap-8">
@@ -191,57 +213,34 @@ export default function MeetingPage() {
                     <section>
                         <h2 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
                             <span className="w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-xs">2</span>
-                            회의 내용 (키워드 입력)
+                            회의 내용 (자유 입력)
                         </h2>
-                        <Card className="space-y-5">
-                            <div>
-                                <label className="block text-sm font-bold text-slate-700 mb-2">📌 안건 (Agenda)</label>
-                                <input
-                                    type="text"
-                                    placeholder="예: 3주차 과제 리뷰, 프로젝트 주제 선정"
-                                    value={meetingData.agenda}
-                                    onChange={(e) => setMeetingData({ ...meetingData, agenda: e.target.value })}
-                                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-slate-800 transition-all placeholder-slate-400"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-bold text-slate-700 mb-2">🗣️ 주요 논의 (Discussion)</label>
+                        <Card className="space-y-4">
+                            <div className="relative">
                                 <textarea
-                                    placeholder="예: 주제 A는 너무 어려워서 B로 변경하자는 의견이 있었음."
-                                    value={meetingData.discussion}
-                                    onChange={(e) => setMeetingData({ ...meetingData, discussion: e.target.value })}
-                                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-slate-800 h-24 resize-none transition-all placeholder-slate-400"
+                                    placeholder="회의 내용을 자유롭게 적어주세요.&#13;&#10;예: 오늘 회식은 강남역에서 하기로 결정함. 철수가 예약 담당. 다음 주 과제는 API 설계."
+                                    value={notes}
+                                    onChange={(e) => setNotes(e.target.value)}
+                                    className="w-full px-4 py-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-slate-800 h-64 resize-none transition-all placeholder-slate-400 leading-relaxed"
                                 />
+                                <div className="absolute bottom-4 right-4">
+                                    <Button
+                                        onClick={handleSmartOrganize}
+                                        size="sm"
+                                        variant="secondary"
+                                        isLoading={isGenerating}
+                                        className="bg-white/80 backdrop-blur-sm shadow-sm border border-indigo-100 text-indigo-600 hover:bg-indigo-50"
+                                    >
+                                        <Wand2 className="w-4 h-4 mr-2" />
+                                        AI 스마트 정리
+                                    </Button>
+                                </div>
                             </div>
 
-                            <div>
-                                <label className="block text-sm font-bold text-slate-700 mb-2">✨ 결정 사항 (Decision)</label>
-                                <textarea
-                                    placeholder="예: 주제 B로 최종 결정함. 역할 분담 완료."
-                                    value={meetingData.decision}
-                                    onChange={(e) => setMeetingData({ ...meetingData, decision: e.target.value })}
-                                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-slate-800 h-24 resize-none transition-all placeholder-slate-400"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-bold text-slate-700 mb-2">🚀 다음 일정 및 과제</label>
-                                <input
-                                    type="text"
-                                    placeholder="예: 다음 주 월요일 8시, API 명세서 작성해오기"
-                                    value={meetingData.nextSteps}
-                                    onChange={(e) => setMeetingData({ ...meetingData, nextSteps: e.target.value })}
-                                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-slate-800 transition-all placeholder-slate-400"
-                                />
-                            </div>
-
-                            <div className="pt-4">
-                                <Button onClick={handleGenerate} fullWidth size="lg" className="group">
-                                    <Sparkles className="w-5 h-5 mr-2 group-hover:animate-pulse" />
-                                    회의록 생성하기
-                                </Button>
-                            </div>
+                            <Button onClick={handleGenerate} fullWidth size="lg" className="group">
+                                <Sparkles className="w-5 h-5 mr-2 group-hover:animate-pulse" />
+                                회의록 생성하기
+                            </Button>
                         </Card>
                     </section>
                 </div>
@@ -253,7 +252,7 @@ export default function MeetingPage() {
                             <span className="w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-xs">3</span>
                             미리보기
                         </h2>
-                        <Card className="flex flex-col min-h-[600px] border-indigo-100 shadow-lg shadow-indigo-50/50">
+                        <Card className="flex flex-col min-h-[800px] border-indigo-100 shadow-lg shadow-indigo-50/50">
                             {generatedMinutes ? (
                                 <>
                                     <div className="flex-1 bg-slate-50 rounded-xl p-4 mb-4 border border-slate-100">

@@ -171,7 +171,7 @@ export default function AssignmentPage() {
                 {/* Right Column: Preview (5 cols) */}
                 <div className="lg:col-span-5 space-y-6">
                     <div className="sticky top-8">
-                        <Card title="보고서 미리보기" className="flex flex-col min-h-[500px] border-indigo-100 shadow-lg shadow-indigo-50/50">
+                        <Card title="보고서 미리보기" className="flex flex-col min-h-[800px] border-indigo-100 shadow-lg shadow-indigo-50/50">
                             {generatedNotice ? (
                                 <>
                                     <div className="flex-1 bg-slate-50 rounded-xl p-4 mb-4 border border-slate-100">
