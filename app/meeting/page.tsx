@@ -252,7 +252,7 @@ export default function MeetingPage() {
                             <span className="w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-xs">3</span>
                             미리보기
                         </h2>
-                        <Card className="flex flex-col min-h-[1000px] border-indigo-100 shadow-lg shadow-indigo-50/50">
+                        <Card className="flex flex-col border-indigo-100 shadow-lg shadow-indigo-50/50" style={{ minHeight: '1000px' }}>
                             {generatedMinutes ? (
                                 <>
                                     <div className="flex-1 bg-slate-50 rounded-xl p-4 mb-4 border border-slate-100">
@@ -260,6 +260,7 @@ export default function MeetingPage() {
                                             value={generatedMinutes}
                                             onChange={(e) => setGeneratedMinutes(e.target.value)}
                                             className="w-full h-full bg-transparent border-none outline-none resize-none font-mono text-sm text-slate-700 leading-relaxed"
+                                            style={{ minHeight: '900px' }}
                                         />
                                     </div>
                                     <div className="flex gap-3">

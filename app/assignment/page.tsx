@@ -171,7 +171,7 @@ export default function AssignmentPage() {
                 {/* Right Column: Preview (5 cols) */}
                 <div className="lg:col-span-5 space-y-6">
                     <div className="sticky top-8">
-                        <Card title="보고서 미리보기" className="flex flex-col min-h-[1000px] border-indigo-100 shadow-lg shadow-indigo-50/50">
+                        <Card title="보고서 미리보기" className="flex flex-col border-indigo-100 shadow-lg shadow-indigo-50/50" style={{ minHeight: '1000px' }}>
                             {generatedNotice ? (
                                 <>
                                     <div className="flex-1 bg-slate-50 rounded-xl p-4 mb-4 border border-slate-100">
@@ -179,6 +179,7 @@ export default function AssignmentPage() {
                                             value={generatedNotice}
                                             onChange={(e) => setGeneratedNotice(e.target.value)}
                                             className="w-full h-full bg-transparent border-none outline-none resize-none font-mono text-sm text-slate-700 leading-relaxed"
+                                            style={{ minHeight: '900px' }}
                                         />
                                     </div>
                                     <div className="flex gap-3">
