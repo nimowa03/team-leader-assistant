@@ -29,13 +29,13 @@ export const generateMeetingMinutes = (
         .join(', ');
 
     return `
-[${teamName} 모임 회의록]
+[📢 ${teamName} 정기 모임 결과]
 📅 일시: ${date}
 
-✅ 출석 현황
-- 참석: ${presentMembers || '없음'}
-- 지각: ${lateMembers || '없음'}
-- 결석: ${absentMembers || '없음'}
+👋 출석 현황
+- 함께하신 분: ${presentMembers || '없음'}
+- 조금 늦으신 분: ${lateMembers || '없음'}
+- 아쉽게 못 오신 분: ${absentMembers || '없음'}
 
 ${content}
 `.trim();
@@ -59,17 +59,17 @@ export const generateAssignmentNotice = (assignment: Assignment, members: Member
     const rate = Math.round((submittedCount / totalCount) * 100) || 0;
 
     return `
-[${teamName} 과제 현황 보고]
+[🔥 ${teamName} 과제 현황 알림]
 📅 마감: 일요일 오후 9시
 
-📊 제출율: ${rate}% (${submittedCount}/${totalCount}명)
+📊 현재 제출율: ${rate}% (${submittedCount}/${totalCount}명)
 
-✅ 제출 완료
+✅ 제출 완료하신 분들 (고생하셨습니다!)
 ${submitted || '-'}
 
-⚠️ 미제출 (확인 필요)
+👀 아직 제출 전이신 분들 (화이팅!)
 ${notSubmitted || '없음 (전원 제출 완료! 🎉)'}
 
-${notSubmitted ? '아직 제출하지 못하신 분들은 서둘러주세요! 🔥' : '이번 주도 모두 고생 많으셨습니다!'}
+${notSubmitted ? '마감 시간 전까지 꼭 제출 부탁드립니다! 🙏' : '이번 주도 모두 정말 고생 많으셨습니다! 다음 주도 화이팅해요! 💪'}
 `.trim();
 };
